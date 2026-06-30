@@ -22,14 +22,26 @@ class ChatController @Inject()(
     request.body
       .validate[ChatRequest]
       .fold(
-        errors => {
+        _ => {
           scala.concurrent.Future.successful(
-            BadRequest(Json.obj("message" -> "Invalid request"))
+            BadRequest(Json.obj(
+              "success" -> false,
+              "message" -> "Solicitud inválida: falta el campo 'message'",
+              "data" -> JsNull
+            ))
           )
         },
         chatRequest => {
           chatService.processMessage(chatRequest.message)
             .map(response => Ok(response))
+            .recover {
+              case e: Exception =>
+                InternalServerError(Json.obj(
+                  "success" -> false,
+                  "message" -> s"Error interno: ${e.getMessage}",
+                  "data" -> JsNull
+                ))
+            }
         }
       )
   }

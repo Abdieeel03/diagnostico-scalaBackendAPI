@@ -1,5 +1,5 @@
-# Health check básico
-#GET     /                       controllers.HomeController.index
+# Health check
+GET     /health                 controllers.HealthController.health
 
 # Chat
 POST    /api/chat               controllers.ChatController.chat

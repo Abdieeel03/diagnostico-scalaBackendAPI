@@ -5,6 +5,7 @@ import play.api.Configuration
 import play.api.libs.json._
 import play.api.libs.ws._
 import scala.concurrent.{ExecutionContext, Future}
+import scala.concurrent.duration._
 
 @Singleton
 class PythonClient @Inject()(
@@ -15,11 +16,30 @@ class PythonClient @Inject()(
 
   def sendMessage(message: String): Future[JsValue] = {
     ws.url(s"$pythonUrl/chat")
+      .withRequestTimeout(60.seconds)
       .post(
         Json.obj(
           "message" -> message
         )
       )
-      .map(_.json)
+      .map { response =>
+        if (response.status >= 200 && response.status < 300) {
+          response.json
+        } else {
+          Json.obj(
+            "success" -> false,
+            "message" -> s"Python engine respondió con error ${response.status}",
+            "data" -> JsNull
+          )
+        }
+      }
+      .recover {
+        case e: Exception =>
+          Json.obj(
+            "success" -> false,
+            "message" -> s"Error de conexión con Python engine: ${e.getMessage}",
+            "data" -> JsNull
+          )
+      }
   }
 }
