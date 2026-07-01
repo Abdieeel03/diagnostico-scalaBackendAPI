@@ -2,4 +2,5 @@
 GET     /health                 controllers.HealthController.health
 
 # Chat
++ nocsrf
 POST    /api/chat               controllers.ChatController.chat

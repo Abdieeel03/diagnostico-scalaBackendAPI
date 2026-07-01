@@ -14,12 +14,13 @@ class PythonClient @Inject()(
                             )(implicit ec: ExecutionContext){
   private val pythonUrl : String = config.get[String]("python.engine.url")
 
-  def sendMessage(message: String): Future[JsValue] = {
+  def sendMessage(message: String, sessionId: Option[String]): Future[JsValue] = {
     ws.url(s"$pythonUrl/chat")
       .withRequestTimeout(60.seconds)
       .post(
         Json.obj(
-          "message" -> message
+          "message" -> message,
+          "session_id" -> sessionId
         )
       )
       .map { response =>

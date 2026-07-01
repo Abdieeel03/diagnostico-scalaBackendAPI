@@ -10,7 +10,7 @@ import scala.concurrent.{ExecutionContext, Future}
 class ChatService @Inject()(
                            pythonClient: PythonClient
                            )(implicit ec: ExecutionContext) {
-  def processMessage(message: String): Future[JsValue] = {
-    pythonClient.sendMessage(message)
+  def processMessage(message: String, sessionId: Option[String]): Future[JsValue] = {
+    pythonClient.sendMessage(message, sessionId)
   }
 }

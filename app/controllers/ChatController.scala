@@ -32,7 +32,7 @@ class ChatController @Inject()(
           )
         },
         chatRequest => {
-          chatService.processMessage(chatRequest.message)
+          chatService.processMessage(chatRequest.message, chatRequest.session_id)
             .map(response => Ok(response))
             .recover {
               case e: Exception =>
