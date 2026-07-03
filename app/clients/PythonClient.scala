@@ -14,15 +14,22 @@ class PythonClient @Inject()(
                             )(implicit ec: ExecutionContext){
   private val pythonUrl : String = config.get[String]("python.engine.url")
 
-  def sendMessage(message: String, sessionId: Option[String]): Future[JsValue] = {
+  def sendMessage(
+    message: String,
+    clientId: String,
+    clientMsgId: Option[String]
+  ): Future[JsValue] = {
+    val payload = Json.obj(
+      "message" -> message,
+      "client_id" -> clientId
+    )
+    val withMsgId = clientMsgId match {
+      case Some(id) => payload + ("client_msg_id" -> JsString(id))
+      case None => payload
+    }
     ws.url(s"$pythonUrl/chat")
       .withRequestTimeout(60.seconds)
-      .post(
-        Json.obj(
-          "message" -> message,
-          "session_id" -> sessionId
-        )
-      )
+      .post(withMsgId)
       .map { response =>
         if (response.status >= 200 && response.status < 300) {
           response.json
