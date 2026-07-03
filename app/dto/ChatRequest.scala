@@ -2,5 +2,6 @@ package dto
 
 case class ChatRequest(
   message: String,
-  session_id: Option[String] = None
+  client_id: String,
+  client_msg_id: Option[String] = None
 )

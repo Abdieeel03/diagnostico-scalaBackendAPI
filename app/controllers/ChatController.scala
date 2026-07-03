@@ -26,13 +26,17 @@ class ChatController @Inject()(
           scala.concurrent.Future.successful(
             BadRequest(Json.obj(
               "success" -> false,
-              "message" -> "Solicitud inválida: falta el campo 'message'",
+              "message" -> "Solicitud inválida: faltan 'message' o 'client_id'",
               "data" -> JsNull
             ))
           )
         },
         chatRequest => {
-          chatService.processMessage(chatRequest.message, chatRequest.session_id)
+          chatService.processMessage(
+            chatRequest.message,
+            chatRequest.client_id,
+            chatRequest.client_msg_id
+          )
             .map(response => Ok(response))
             .recover {
               case e: Exception =>
