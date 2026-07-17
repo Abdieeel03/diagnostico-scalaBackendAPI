@@ -18,11 +18,11 @@ WORKDIR /app
 
 COPY --from=builder /app/target/universal/stage .
 
-ENV JAVA_OPTS="-Dplay.http.secret.key=UY4Bm9zPx7Lq2Vk8Rt5Nw3Jf6Hd1CsAe0GyObnMpXiQuSvWaKc"
+ENV PORT=9000
 
 EXPOSE 9000
 
-HEALTHCHECK --interval=15s --timeout=5s --start-period=30s --retries=3 \
-  CMD curl -f http://localhost:9000/health || exit 1
+HEALTHCHECK --interval=15s --timeout=5s --start-period=60s --retries=3 \
+  CMD curl -f http://localhost:${PORT}/health || exit 1
 
-CMD ["bin/diagnostico-scalabackendapi"]
+CMD bin/diagnostico-scalabackendapi -Dplay.server.http.port=${PORT} -Dhttp.port=${PORT}
